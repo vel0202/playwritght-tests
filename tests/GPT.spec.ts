@@ -9,69 +9,99 @@ test.describe('Playwright.dev - Полное тестирование', () => {
   // 1. МЕТРИКИ ПРОИЗВОДИТЕЛЬНОСТИ
   // ============================================
   test('Сбор основных метрик производительности', async ({ page }) => {
-    // 👇 Загружаем страницу и сразу собираем метрики
     const metrics = await test.step('Сбор метрик производительности', async () => {
-      // Переходим на страницу и собираем метрики в одном evaluate
-      const result = await page.evaluate(async () => {
-        // Ждём загрузки страницы
-        await new Promise((resolve) => {
+      const result = await page.evaluate(() => {
+        // 👇 Убираем async и используем обычный Promise
+        return new Promise((resolve) => {
+          // Проверяем, загружена ли страница
           if (document.readyState === 'complete') {
-            resolve();
+            // 👇 Используем setTimeout, чтобы дать время на сбор метрик
+            setTimeout(() => {
+              const perfData = performance.getEntriesByType(
+                'navigation',
+              )[0] as PerformanceNavigationTiming;
+
+              if (!perfData) {
+                resolve({ error: 'Нет данных о навигации' });
+                return;
+              }
+
+              const resources = performance.getEntriesByType(
+                'resource',
+              ) as PerformanceResourceTiming[];
+
+              resolve({
+                domContentLoaded:
+                  perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart,
+                loadTime: perfData.loadEventEnd - perfData.loadEventStart,
+                totalTime: perfData.loadEventEnd - perfData.fetchStart,
+                domInteractive: perfData.domInteractive - perfData.fetchStart,
+                redirectTime: perfData.redirectEnd - perfData.redirectStart,
+                dnsLookup: perfData.domainLookupEnd - perfData.domainLookupStart,
+                tcpConnect: perfData.connectEnd - perfData.connectStart,
+                requestTime: perfData.responseEnd - perfData.requestStart,
+                resources: resources.length,
+                totalSize: resources.reduce((acc, res) => acc + (res.transferSize || 0), 0),
+                requests: resources.length,
+                slowestResource:
+                  resources.sort((a, b) => b.duration - a.duration)[0]?.name || 'Нет',
+              });
+            }, 500);
           } else {
-            window.addEventListener('load', resolve);
+            // Ждём загрузки страницы
+            window.addEventListener('load', () => {
+              setTimeout(() => {
+                const perfData = performance.getEntriesByType(
+                  'navigation',
+                )[0] as PerformanceNavigationTiming;
+
+                if (!perfData) {
+                  resolve({ error: 'Нет данных о навигации' });
+                  return;
+                }
+
+                const resources = performance.getEntriesByType(
+                  'resource',
+                ) as PerformanceResourceTiming[];
+
+                resolve({
+                  domContentLoaded:
+                    perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart,
+                  loadTime: perfData.loadEventEnd - perfData.loadEventStart,
+                  totalTime: perfData.loadEventEnd - perfData.fetchStart,
+                  domInteractive: perfData.domInteractive - perfData.fetchStart,
+                  redirectTime: perfData.redirectEnd - perfData.redirectStart,
+                  dnsLookup: perfData.domainLookupEnd - perfData.domainLookupStart,
+                  tcpConnect: perfData.connectEnd - perfData.connectStart,
+                  requestTime: perfData.responseEnd - perfData.requestStart,
+                  resources: resources.length,
+                  totalSize: resources.reduce((acc, res) => acc + (res.transferSize || 0), 0),
+                  requests: resources.length,
+                  slowestResource:
+                    resources.sort((a, b) => b.duration - a.duration)[0]?.name || 'Нет',
+                });
+              }, 500);
+            });
           }
         });
-
-        // Даём время на сбор метрик
-        await new Promise((resolve) => setTimeout(resolve, 500));
-
-        const perfData = performance.getEntriesByType(
-          'navigation',
-        )[0] as PerformanceNavigationTiming;
-
-        if (!perfData) {
-          return { error: 'Нет данных о навигации' };
-        }
-
-        const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
-
-        return {
-          domContentLoaded: perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart,
-          loadTime: perfData.loadEventEnd - perfData.loadEventStart,
-          totalTime: perfData.loadEventEnd - perfData.fetchStart,
-          domInteractive: perfData.domInteractive - perfData.fetchStart,
-          redirectTime: perfData.redirectEnd - perfData.redirectStart,
-          dnsLookup: perfData.domainLookupEnd - perfData.domainLookupStart,
-          tcpConnect: perfData.connectEnd - perfData.connectStart,
-          requestTime: perfData.responseEnd - perfData.requestStart,
-          resources: resources.length,
-          totalSize: resources.reduce((acc, res) => acc + (res.transferSize || 0), 0),
-          requests: resources.length,
-          slowestResource: resources.sort((a, b) => b.duration - a.duration)[0]?.name || 'Нет',
-        };
       });
 
-      if (result.error) {
-        console.warn('⚠️', result.error);
-        return null;
-      }
       return result;
     });
 
-    if (!metrics) {
-      console.warn('⚠️ Тест пропущен из-за отсутствия метрик');
+    if (!metrics || metrics.error) {
+      console.warn('⚠️', metrics?.error || 'Нет данных');
       return;
     }
 
-    // Вывод и проверка метрик
     console.log('📊 Метрики производительности:');
-    console.log(`- DOM Content Loaded: ${metrics.domContentLoaded?.toFixed(2) || 0}ms`);
-    console.log(`- Полная загрузка: ${metrics.loadTime?.toFixed(2) || 0}ms`);
-    console.log(`- Общее время: ${metrics.totalTime?.toFixed(2) || 0}ms`);
-    console.log(`- DOM Interactive: ${metrics.domInteractive?.toFixed(2) || 0}ms`);
-    console.log(`- DNS Lookup: ${metrics.dnsLookup?.toFixed(2) || 0}ms`);
-    console.log(`- TCP Connect: ${metrics.tcpConnect?.toFixed(2) || 0}ms`);
-    console.log(`- Запросы: ${metrics.requests || 0}`);
+    console.log(`- DOM Content Loaded: ${metrics.domContentLoaded.toFixed(2)}ms`);
+    console.log(`- Полная загрузка: ${metrics.loadTime.toFixed(2)}ms`);
+    console.log(`- Общее время: ${metrics.totalTime.toFixed(2)}ms`);
+    console.log(`- DOM Interactive: ${metrics.domInteractive.toFixed(2)}ms`);
+    console.log(`- DNS Lookup: ${metrics.dnsLookup.toFixed(2)}ms`);
+    console.log(`- TCP Connect: ${metrics.tcpConnect.toFixed(2)}ms`);
+    console.log(`- Запросы: ${metrics.requests}`);
     console.log(`- Размер: ${(metrics.totalSize / 1024).toFixed(2)}KB`);
     console.log(`- Самый медленный ресурс: ${metrics.slowestResource}`);
 
@@ -173,6 +203,7 @@ test.describe('Playwright.dev - Полное тестирование', () => {
       const searchInput = page.locator('.DocSearch-Input');
       await expect(searchInput).toBeVisible({ timeout: 5000 });
       await searchInput.fill('locator');
+      await page.waitForTimeout(2000);
 
       await page.waitForSelector('.DocSearch-Hit', { timeout: 5000 });
       const hits = page.locator('.DocSearch-Hit');

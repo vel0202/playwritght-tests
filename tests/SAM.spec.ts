@@ -107,5 +107,20 @@ test.describe('Проверка главной страницы', () => {
       await page.getByRole('link', { name: 'Playwright logo Playwright' }).click();
       await expect(page).toHaveURL('https://playwright.dev/');
     });
+
+    await test.step('Переходим в поиск', async () => {
+      await page.getByRole('button', { name: 'Search (Control+k)' }).click();
+      const searchInput = page.locator('.DocSearch-Input');
+      await expect(searchInput).toBeVisible({ timeout: 5000 });
+      await searchInput.fill('locator');
+      await page.waitForTimeout(2000);
+      await page.keyboard.press('Enter');
+      await expect(page.getByRole('heading', { name: 'Locators', exact: true })).toBeVisible();
+    });
+
+    await test.step('Переходим на главную страницу обратно', async () => {
+      await page.getByRole('link', { name: 'Playwright logo Playwright' }).click();
+      await expect(page).toHaveURL('https://playwright.dev/');
+    });
   });
 });
