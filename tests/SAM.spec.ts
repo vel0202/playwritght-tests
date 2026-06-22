@@ -75,16 +75,37 @@ test.describe('Проверка главной страницы', () => {
   });
 
   test('Побегаем по странице', async ({ page }) => {
-    await page.getByRole('button', { name: 'Switch between dark and light' }).click();
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
-    await page.getByRole('button', { name: 'Switch between dark and light' }).click();
-    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
-    await page.getByRole('link', { name: 'Get started' }).click();
-    await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Installation' })).toContainText('Installation');
-    await page.getByRole('link', { name: 'VS Code', exact: true }).click();
-    await expect(page.getByRole('heading', { name: 'VS Code' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'VS Code' })).toContainText('VS Code');
-    await page.getByRole('link', { name: 'Playwright logo Playwright' }).click();
+    // Увеличиваем таймаут для всего теста
+    test.setTimeout(60000);
+
+    // 👇 Добавляем await перед каждым test.step()
+    await test.step('Меняем тему', async () => {
+      await page.getByRole('button', { name: 'Switch between dark and light' }).click();
+      await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+      await page.getByRole('button', { name: 'Switch between dark and light' }).click();
+      await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    });
+
+    await test.step('Переходим в раздел Get Started', async () => {
+      await page.getByRole('link', { name: 'Get started' }).click();
+
+      const heading = page.getByRole('heading', { name: 'Installation' });
+      await expect(heading).toBeVisible({ timeout: 10000 });
+      await expect(heading).toContainText('Installation');
+    });
+
+    await test.step('Переходим в раздел VS Code', async () => {
+      await page.getByRole('link', { name: 'VS Code', exact: true }).click();
+      await page.waitForLoadState('domcontentloaded');
+
+      const heading = page.getByRole('heading', { name: 'VS Code' });
+      await expect(heading).toBeVisible({ timeout: 10000 });
+      await expect(heading).toContainText('VS Code');
+    });
+
+    await test.step('Переходим на главную страницу обратно', async () => {
+      await page.getByRole('link', { name: 'Playwright logo Playwright' }).click();
+      await expect(page).toHaveURL('https://playwright.dev/');
+    });
   });
 });
