@@ -7,7 +7,6 @@ test('test', async ({ page }) => {
   // ШАГ 1: Переход на сайт
   // ============================================
   await test.step('Переход на сайт Playwright', async () => {
-    // Очищаем кеш для чистоты измерений
     await page.context().clearCookies();
     await page.goto('https://playwright.dev/');
     await expect(page.getByRole('button', { name: 'Search (Control+k)' })).toBeVisible();
@@ -52,56 +51,42 @@ test('test', async ({ page }) => {
   // ШАГ 6: Сбор ВСЕХ метрик производительности
   // ============================================
   await test.step('Сбор полных метрик производительности', async () => {
-    // Ждём полной загрузки
     await page.waitForLoadState('networkidle');
     await page.waitForTimeout(1000);
 
-    const metrics = await page.evaluate(() => {
+    const rawMetrics = await page.evaluate(() => {
       const perfData = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
       const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
       const paintEntries = performance.getEntriesByType('paint');
       const lcpEntries = performance.getEntriesByType('largest-contentful-paint');
 
       if (!perfData) {
-        return { error: 'Нет данных о навигации' };
+        return null;
       }
 
-      // ============================================
-      // 1. ОСНОВНЫЕ МЕТРИКИ ЗАГРУЗКИ
-      // ============================================
+      // ---------- ОСНОВНЫЕ МЕТРИКИ ----------
       const totalTime = perfData.loadEventEnd - perfData.fetchStart;
       const domInteractive = perfData.domInteractive - perfData.fetchStart;
       const domContentLoaded =
         perfData.domContentLoadedEventEnd - perfData.domContentLoadedEventStart;
       const loadTime = perfData.loadEventEnd - perfData.loadEventStart;
 
-      // ============================================
-      // 2. СЕТЕВЫЕ МЕТРИКИ
-      // ============================================
+      // ---------- СЕТЕВЫЕ МЕТРИКИ ----------
       const dnsLookup = perfData.domainLookupEnd - perfData.domainLookupStart;
       const tcpConnect = perfData.connectEnd - perfData.connectStart;
       const requestTime = perfData.responseEnd - perfData.requestStart;
       const ttfb = perfData.responseStart - perfData.requestStart;
       const serverResponseTime = perfData.responseStart - perfData.fetchStart;
 
-      // ============================================
-      // 3. МЕТРИКИ РЕНДЕРИНГА (Paint)
-      // ============================================
+      // ---------- МЕТРИКИ РЕНДЕРИНГА ----------
       const fcp = paintEntries.find((p) => p.name === 'first-contentful-paint')?.startTime || 0;
       const fp = paintEntries.find((p) => p.name === 'first-paint')?.startTime || 0;
-
-      // ============================================
-      // 4. LCP (Largest Contentful Paint)
-      // ============================================
       const lcp = lcpEntries.length > 0 ? lcpEntries[lcpEntries.length - 1].startTime : 0;
 
-      // ============================================
-      // 5. МЕТРИКИ РЕСУРСОВ
-      // ============================================
+      // ---------- МЕТРИКИ РЕСУРСОВ ----------
       const totalResources = resources.length;
       const totalSize = resources.reduce((acc, res) => acc + (res.transferSize || 0), 0);
 
-      // Ресурсы по типам
       const jsFiles = resources.filter((r) => r.initiatorType === 'script');
       const cssFiles = resources.filter((r) => r.initiatorType === 'css');
       const imgFiles = resources.filter((r) => r.initiatorType === 'img');
@@ -111,55 +96,40 @@ test('test', async ({ page }) => {
         (r) => !['script', 'css', 'img', 'font', 'fetch'].includes(r.initiatorType),
       );
 
-      // Размеры по типам
       const jsSize = jsFiles.reduce((acc, r) => acc + (r.transferSize || 0), 0);
       const cssSize = cssFiles.reduce((acc, r) => acc + (r.transferSize || 0), 0);
       const imgSize = imgFiles.reduce((acc, r) => acc + (r.transferSize || 0), 0);
       const fontSize = fontFiles.reduce((acc, r) => acc + (r.transferSize || 0), 0);
 
-      // Самый медленный ресурс
-      const slowestResource = resources.sort((a, b) => b.duration - a.duration)[0];
+      const slowest = resources.sort((a, b) => b.duration - a.duration)[0];
 
-      // ============================================
-      // 6. МЕТРИКИ ВРЕМЕНИ
-      // ============================================
+      // ---------- МЕТРИКИ ВРЕМЕНИ ----------
       const timeToFirstByte = perfData.responseStart - perfData.fetchStart;
       const timeToDomContentLoaded = perfData.domContentLoadedEventEnd - perfData.fetchStart;
       const timeToLoad = perfData.loadEventEnd - perfData.fetchStart;
       const timeToFirstRequest = resources.length > 0 ? resources[0].startTime : 0;
 
-      // ============================================
-      // 7. МЕТРИКИ ПРОЦЕССОРА
-      // ============================================
+      // ---------- МЕТРИКИ ПРОЦЕССОРА ----------
       const domProcessing = perfData.domContentLoadedEventEnd - perfData.domInteractive;
       const domCompletion = perfData.domContentLoadedEventStart - perfData.domInteractive;
 
-      // ============================================
-      // 8. МЕТРИКИ РЕДИРЕКТА
-      // ============================================
+      // ---------- МЕТРИКИ РЕДИРЕКТА ----------
       const redirectTime = perfData.redirectEnd - perfData.redirectStart;
       const redirectCount = perfData.redirectCount || 0;
 
       return {
-        // ---------- ОСНОВНЫЕ МЕТРИКИ ----------
         totalTime,
         domInteractive,
         domContentLoaded,
         loadTime,
-
-        // ---------- СЕТЕВЫЕ МЕТРИКИ ----------
         dnsLookup,
         tcpConnect,
         requestTime,
         ttfb,
         serverResponseTime,
-
-        // ---------- МЕТРИКИ РЕНДЕРИНГА ----------
         fcp,
         fp,
         lcp,
-
-        // ---------- МЕТРИКИ РЕСУРСОВ ----------
         totalResources,
         totalSize,
         jsFiles: jsFiles.length,
@@ -172,35 +142,69 @@ test('test', async ({ page }) => {
         cssSize,
         imgSize,
         fontSize,
-        slowestResource: slowestResource
+        slowestResource: slowest
           ? {
-              name: slowestResource.name,
-              duration: slowestResource.duration,
-              size: slowestResource.transferSize || 0,
-              type: slowestResource.initiatorType,
+              name: slowest.name,
+              duration: slowest.duration,
+              size: slowest.transferSize || 0,
+              type: slowest.initiatorType,
             }
           : null,
-
-        // ---------- МЕТРИКИ ВРЕМЕНИ ----------
         timeToFirstByte,
         timeToDomContentLoaded,
         timeToLoad,
         timeToFirstRequest,
-
-        // ---------- МЕТРИКИ ПРОЦЕССОРА ----------
         domProcessing,
         domCompletion,
-
-        // ---------- МЕТРИКИ РЕДИРЕКТА ----------
         redirectTime,
         redirectCount,
       };
     });
 
-    if (metrics.error) {
-      console.warn('⚠️', metrics.error);
+    // ============================================
+    // БЕЗОПАСНАЯ ОБРАБОТКА МЕТРИК
+    // ============================================
+    if (!rawMetrics) {
+      console.warn('⚠️ Нет данных о метриках производительности');
       return;
     }
+
+    // Создаём безопасный объект с дефолтными значениями
+    const metrics = {
+      totalTime: rawMetrics.totalTime || 0,
+      domInteractive: rawMetrics.domInteractive || 0,
+      domContentLoaded: rawMetrics.domContentLoaded || 0,
+      loadTime: rawMetrics.loadTime || 0,
+      dnsLookup: rawMetrics.dnsLookup || 0,
+      tcpConnect: rawMetrics.tcpConnect || 0,
+      requestTime: rawMetrics.requestTime || 0,
+      ttfb: rawMetrics.ttfb || 0,
+      serverResponseTime: rawMetrics.serverResponseTime || 0,
+      fcp: rawMetrics.fcp || 0,
+      fp: rawMetrics.fp || 0,
+      lcp: rawMetrics.lcp || 0,
+      totalResources: rawMetrics.totalResources || 0,
+      totalSize: rawMetrics.totalSize || 0,
+      jsFiles: rawMetrics.jsFiles || 0,
+      cssFiles: rawMetrics.cssFiles || 0,
+      imgFiles: rawMetrics.imgFiles || 0,
+      fontFiles: rawMetrics.fontFiles || 0,
+      fetchFiles: rawMetrics.fetchFiles || 0,
+      otherFiles: rawMetrics.otherFiles || 0,
+      jsSize: rawMetrics.jsSize || 0,
+      cssSize: rawMetrics.cssSize || 0,
+      imgSize: rawMetrics.imgSize || 0,
+      fontSize: rawMetrics.fontSize || 0,
+      slowestResource: rawMetrics.slowestResource || null,
+      timeToFirstByte: rawMetrics.timeToFirstByte || 0,
+      timeToDomContentLoaded: rawMetrics.timeToDomContentLoaded || 0,
+      timeToLoad: rawMetrics.timeToLoad || 0,
+      timeToFirstRequest: rawMetrics.timeToFirstRequest || 0,
+      domProcessing: rawMetrics.domProcessing || 0,
+      domCompletion: rawMetrics.domCompletion || 0,
+      redirectTime: rawMetrics.redirectTime || 0,
+      redirectCount: rawMetrics.redirectCount || 0,
+    };
 
     // ============================================
     // ВЫВОД ВСЕХ МЕТРИК
@@ -286,17 +290,13 @@ test('test', async ({ page }) => {
     // ПРОВЕРКИ (АССЕРТЫ)
     // ============================================
     await test.step('Проверка критических метрик', async () => {
-      // Основные проверки
       expect(metrics.totalTime).toBeLessThan(5000);
-      expect(metrics.domInteractive).toBeLessThan(4000);
+      expect(metrics.domInteractive).toBeLessThan(3000);
       expect(metrics.ttfb).toBeLessThan(800);
       expect(metrics.lcp).toBeLessThan(4000);
-
-      // Проверка, что страница не слишком тяжёлая
       expect(metrics.totalResources).toBeLessThan(200);
-      expect(metrics.totalSize).toBeLessThan(5 * 1024 * 1024); // 5MB
+      expect(metrics.totalSize).toBeLessThan(5 * 1024 * 1024);
 
-      // Проверка, что нет медленных ресурсов (> 2 секунд)
       if (metrics.slowestResource) {
         expect(metrics.slowestResource.duration).toBeLessThan(2000);
       }
