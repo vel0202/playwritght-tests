@@ -1,0 +1,332 @@
+{
+  "timestamp": "2026-06-24T09:48:47.092Z",
+  "usersCount": 10,
+  "totalTestTime": 62607,
+  "successful": 10,
+  "failed": 0,
+  "stats": {
+    "totalUserTime": {
+      "avg": 16277.4,
+      "median": 15869,
+      "p95": 18900,
+      "p99": 18900,
+      "min": 15125,
+      "max": 18900,
+      "stdDev": 1129.9809909905564
+    },
+    "mainPageLoad": {
+      "avg": 2133.8,
+      "median": 2128.5,
+      "p95": 2565,
+      "p99": 2565,
+      "min": 1759,
+      "max": 2565,
+      "stdDev": 233.99777776722584
+    },
+    "login": {
+      "avg": 11419.6,
+      "median": 11127.5,
+      "p95": 13987,
+      "p99": 13987,
+      "min": 10524,
+      "max": 13987,
+      "stdDev": 1015.1539981697358
+    },
+    "orgClick": {
+      "avg": 1296.2,
+      "median": 1092.5,
+      "p95": 2505,
+      "p99": 2505,
+      "min": 747,
+      "max": 2505,
+      "stdDev": 492.9131363638019
+    },
+    "search": {
+      "avg": 1411.6,
+      "median": 1413.5,
+      "p95": 1469,
+      "p99": 1469,
+      "min": 1335,
+      "max": 1469,
+      "stdDev": 38.43487999200726
+    }
+  },
+  "navStats": {
+    "domContentLoaded": {
+      "avg": 0.05,
+      "median": 0.04999999701976776,
+      "p95": 0.10000000894069672,
+      "p99": 0.10000000894069672,
+      "min": 0,
+      "max": 0.10000000894069672,
+      "stdDev": 0.050000000000000266
+    },
+    "load": {
+      "avg": 0,
+      "median": 0,
+      "p95": 0,
+      "p99": 0,
+      "min": 0,
+      "max": 0,
+      "stdDev": 0
+    },
+    "responseEnd": {
+      "avg": 89.25000000149012,
+      "median": 95.80000000447035,
+      "p95": 106.6000000089407,
+      "p99": 106.6000000089407,
+      "min": 57.79999999701977,
+      "max": 106.6000000089407,
+      "stdDev": 16.52587365746107
+    },
+    "domInteractive": {
+      "avg": 195.29000000059605,
+      "median": 207.05000000447035,
+      "p95": 227.90000000596046,
+      "p99": 227.90000000596046,
+      "min": 124.70000000298023,
+      "max": 227.90000000596046,
+      "stdDev": 32.752845678216296
+    },
+    "totalTime": {
+      "avg": 257.02000000178816,
+      "median": 265.3999999985099,
+      "p95": 321.29999999701977,
+      "p99": 321.29999999701977,
+      "min": 172,
+      "max": 321.29999999701977,
+      "stdDev": 42.55957706448082
+    },
+    "transferSize": {
+      "avg": 2355,
+      "median": 2354.5,
+      "p95": 2358,
+      "p99": 2358,
+      "min": 2353,
+      "max": 2358,
+      "stdDev": 1.7320508075688772
+    },
+    "encodedBodySize": {
+      "avg": 2055,
+      "median": 2054.5,
+      "p95": 2058,
+      "p99": 2058,
+      "min": 2053,
+      "max": 2058,
+      "stdDev": 1.7320508075688772
+    },
+    "decodedBodySize": {
+      "avg": 6095,
+      "median": 6095,
+      "p95": 6095,
+      "p99": 6095,
+      "min": 6095,
+      "max": 6095,
+      "stdDev": 0
+    }
+  },
+  "details": [
+    {
+      "userNumber": 1,
+      "success": true,
+      "totalUserTime": 17809,
+      "mainPageLoadTime": 2502,
+      "loginTime": 11345,
+      "orgClickTime": 2505,
+      "searchTime": 1438,
+      "navigationTimings": {
+        "domContentLoaded": 0.09999999403953552,
+        "load": 0,
+        "responseEnd": 102.90000000596046,
+        "domInteractive": 220.70000000298023,
+        "totalTime": 311,
+        "transferSize": 2355,
+        "encodedBodySize": 2055,
+        "decodedBodySize": 6095
+      },
+      "error": null
+    },
+    {
+      "userNumber": 2,
+      "success": true,
+      "totalUserTime": 15851,
+      "mainPageLoadTime": 2059,
+      "loginTime": 11373,
+      "orgClickTime": 1070,
+      "searchTime": 1335,
+      "navigationTimings": {
+        "domContentLoaded": 0,
+        "load": 0,
+        "responseEnd": 91.90000000596046,
+        "domInteractive": 196.20000000298023,
+        "totalTime": 263.5,
+        "transferSize": 2358,
+        "encodedBodySize": 2058,
+        "decodedBodySize": 6095
+      },
+      "error": null
+    },
+    {
+      "userNumber": 3,
+      "success": true,
+      "totalUserTime": 15887,
+      "mainPageLoadTime": 2139,
+      "loginTime": 10822,
+      "orgClickTime": 1458,
+      "searchTime": 1453,
+      "navigationTimings": {
+        "domContentLoaded": 0,
+        "load": 0,
+        "responseEnd": 101.80000001192093,
+        "domInteractive": 223.70000000298023,
+        "totalTime": 275.6000000089407,
+        "transferSize": 2354,
+        "encodedBodySize": 2054,
+        "decodedBodySize": 6095
+      },
+      "error": null
+    },
+    {
+      "userNumber": 4,
+      "success": true,
+      "totalUserTime": 15584,
+      "mainPageLoadTime": 1990,
+      "loginTime": 10538,
+      "orgClickTime": 1650,
+      "searchTime": 1394,
+      "navigationTimings": {
+        "domContentLoaded": 0,
+        "load": 0,
+        "responseEnd": 57.79999999701977,
+        "domInteractive": 124.70000000298023,
+        "totalTime": 172,
+        "transferSize": 2354,
+        "encodedBodySize": 2054,
+        "decodedBodySize": 6095
+      },
+      "error": null
+    },
+    {
+      "userNumber": 5,
+      "success": true,
+      "totalUserTime": 15125,
+      "mainPageLoadTime": 2158,
+      "loginTime": 10524,
+      "orgClickTime": 1043,
+      "searchTime": 1383,
+      "navigationTimings": {
+        "domContentLoaded": 0.10000000894069672,
+        "load": 0,
+        "responseEnd": 67.09999999403954,
+        "domInteractive": 225.3999999910593,
+        "totalTime": 267.29999999701977,
+        "transferSize": 2356,
+        "encodedBodySize": 2056,
+        "decodedBodySize": 6095
+      },
+      "error": null
+    },
+    {
+      "userNumber": 6,
+      "success": true,
+      "totalUserTime": 15310,
+      "mainPageLoadTime": 2118,
+      "loginTime": 10589,
+      "orgClickTime": 1115,
+      "searchTime": 1469,
+      "navigationTimings": {
+        "domContentLoaded": 0,
+        "load": 0,
+        "responseEnd": 106.6000000089407,
+        "domInteractive": 164.20000000298023,
+        "totalTime": 216.90000000596046,
+        "transferSize": 2354,
+        "encodedBodySize": 2054,
+        "decodedBodySize": 6095
+      },
+      "error": null
+    },
+    {
+      "userNumber": 7,
+      "success": true,
+      "totalUserTime": 16458,
+      "mainPageLoadTime": 2155,
+      "loginTime": 12141,
+      "orgClickTime": 747,
+      "searchTime": 1399,
+      "navigationTimings": {
+        "domContentLoaded": 0.09999999403953552,
+        "load": 0,
+        "responseEnd": 72.8999999910593,
+        "domInteractive": 168.79999999701977,
+        "totalTime": 228.29999999701977,
+        "transferSize": 2358,
+        "encodedBodySize": 2058,
+        "decodedBodySize": 6095
+      },
+      "error": null
+    },
+    {
+      "userNumber": 8,
+      "success": true,
+      "totalUserTime": 15621,
+      "mainPageLoadTime": 1759,
+      "loginTime": 10910,
+      "orgClickTime": 1556,
+      "searchTime": 1380,
+      "navigationTimings": {
+        "domContentLoaded": 0.09999999403953552,
+        "load": 0,
+        "responseEnd": 87.70000000298023,
+        "domInteractive": 217.90000000596046,
+        "totalTime": 235.80000001192093,
+        "transferSize": 2353,
+        "encodedBodySize": 2053,
+        "decodedBodySize": 6095
+      },
+      "error": null
+    },
+    {
+      "userNumber": 9,
+      "success": true,
+      "totalUserTime": 18900,
+      "mainPageLoadTime": 2565,
+      "loginTime": 13987,
+      "orgClickTime": 907,
+      "searchTime": 1428,
+      "navigationTimings": {
+        "domContentLoaded": 0.10000000894069672,
+        "load": 0,
+        "responseEnd": 104.09999999403954,
+        "domInteractive": 183.3999999910593,
+        "totalTime": 321.29999999701977,
+        "transferSize": 2353,
+        "encodedBodySize": 2053,
+        "decodedBodySize": 6095
+      },
+      "error": null
+    },
+    {
+      "userNumber": 10,
+      "success": true,
+      "totalUserTime": 16229,
+      "mainPageLoadTime": 1893,
+      "loginTime": 11967,
+      "orgClickTime": 911,
+      "searchTime": 1437,
+      "navigationTimings": {
+        "domContentLoaded": 0,
+        "load": 0,
+        "responseEnd": 99.70000000298023,
+        "domInteractive": 227.90000000596046,
+        "totalTime": 278.5,
+        "transferSize": 2355,
+        "encodedBodySize": 2055,
+        "decodedBodySize": 6095
+      },
+      "error": null
+    }
+  ],
+  "maxAllowedFailed": 1,
+  "startDelay": 5000
+}
